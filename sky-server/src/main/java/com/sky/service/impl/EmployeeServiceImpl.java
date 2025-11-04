@@ -23,6 +23,7 @@ import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -33,8 +34,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     /**
      * 员工登录
      *
-     * @param employeeLoginDTO
-     * @return
      */
     public Employee login(EmployeeLoginDTO employeeLoginDTO) {
         String username = employeeLoginDTO.getUsername();
@@ -50,14 +49,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         //密码比对
-        // 对前端的密码进行md5加密
-        //password=DigestUtils.md5DigestAsHex(password.getBytes());
+        password=DigestUtils.md5DigestAsHex(password.getBytes());
         if (!password.equals(employee.getPassword())) {
             //密码错误
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
         }
 
-        if (employee.getStatus() == StatusConstant.DISABLE) {
+        if (Objects.equals(employee.getStatus(), StatusConstant.DISABLE)) {
             //账号被锁定
             throw new AccountLockedException(MessageConstant.ACCOUNT_LOCKED);
         }
@@ -101,6 +99,39 @@ public class EmployeeServiceImpl implements EmployeeService {
         long total=page.getTotal();
         List<Employee> records=page.getResult();
         return new PageResult(total,records);
+    }
+
+    @Override
+    public void startOrStop(Integer status, long id) {
+        //update employee set status = ? where id = ?
+
+      Employee employee= Employee.builder()
+               .id(id)
+               .status(status)
+               .build();
+
+        employeeMapper.update(employee);
+    }
+
+    @Override
+    public Employee getById(Long id) {
+        Employee employee= employeeMapper.getById(id);
+        employee.setPassword("****");
+        return employee;
+    }
+
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO,employee);//属性拷贝
+
+        //设置修改时间
+        employee.setUpdateTime(LocalDateTime.now());
+
+        //设置修改人
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+        employeeMapper.update(employee);
     }
 
 }

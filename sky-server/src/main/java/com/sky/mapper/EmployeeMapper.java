@@ -12,8 +12,6 @@ public interface EmployeeMapper {
 
     /**
      * 根据用户名查询员工
-     * @param username
-     * @return
      */
     @Select("select * from employee where username = #{username}")
     Employee getByUsername(String username);
@@ -28,4 +26,9 @@ public interface EmployeeMapper {
      */
 
     Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+
+    void update(Employee employee);
+
+    @Select("select * from employee where id = #{id}")
+    Employee getById(Long id);
 }
