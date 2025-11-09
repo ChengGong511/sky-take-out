@@ -8,6 +8,7 @@ import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.entity.Employee;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
@@ -93,12 +94,61 @@ public class DishServiceImpl implements DishService {
             throw new DeletionNotAllowedException(MessageConstant.CATEGORY_BE_RELATED_BY_DISH);
         }
 
-        //删除菜品表中的数据
-        for (Long id : ids) {
-            dishMapper.deleteById(id);
-            //删除菜品口味表中的数据
-            dishFlavorMapper.deleteByDishId(id);
+        dishMapper.deleteByIds(ids);
+        //批量删除菜品口味表中的数据
+        dishFlavorMapper.deleteByDishIds(ids);
+    }
+
+    /*
+        * 根据id查询菜品信息和对应的口味信息
+     */
+    @Override
+    public DishVO getByIdWithFlavor(Long id) {
+        //查询菜品基本信息
+        Dish dish = dishMapper.getById(id);
+
+        //查询对应的口味信息
+        List<DishFlavor> flavors = dishFlavorMapper.getByDishId(id);
+
+        //  组装成DishVO对象并返回
+        DishVO dishVO = new DishVO();
+        BeanUtils.copyProperties(dish, dishVO);
+        dishVO.setFlavors(flavors);
+
+        return dishVO;
+    }
+
+    @Override
+    @Transactional
+    public void updateWithFlavor(DishDTO dishDTO) {
+        //修改菜品基本信息
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO, dish);
+        dishMapper.update(dish);
+
+        //删除原有口味数据
+        dishFlavorMapper.deleteByDishId(dishDTO.getId());
+
+        //插入新的口味数据
+        List<DishFlavor> flavors = dishDTO.getFlavors();
+        if(flavors !=null && !flavors.isEmpty()){
+            flavors.forEach(item-> item.setDishId(dishDTO.getId()));
+
+            dishFlavorMapper.insertBatch(flavors);
+
         }
 
     }
+
+    @Override
+    public void startOrStop(Integer status, long id) {
+        Dish dish= Dish.builder()
+                .id(id)
+                .status(status)
+                .build();
+
+        dishMapper.update(dish);
+    }
+
+
 }
