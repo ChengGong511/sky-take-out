@@ -1,0 +1,24 @@
+package com.sky.controller.user;
+
+import com.sky.result.Result;
+import com.sky.service.impl.ShopServiceImpl;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+@RestController("userShopController")
+@RequestMapping("/user/shop")
+@Slf4j
+@Api(tags="店铺管理")
+public class ShopController {
+
+    private ShopServiceImpl shopService;
+    @ApiOperation(value = "查看店铺状态")
+    @GetMapping("/status")
+    public Result<Integer> getShopStatus() {
+        Integer status =shopService.getShopStatus(); // 假设1表示营业中，0表示休息中
+        log.info("查看店铺状态为：{}", status == 1 ? "营业中" : "休息中");
+        return Result.success(status);
+    }
+}

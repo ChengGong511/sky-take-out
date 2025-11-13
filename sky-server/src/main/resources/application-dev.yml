@@ -3,9 +3,14 @@ sky:
     driver-class-name: com.mysql.cj.jdbc.Driver
     host: localhost
     port: 3306
-    database: sky_take_out
+    database: sky-take-out
     username: root
     password: 123456
+  redis:
+    host: localhost
+    port: 6379
+    requirepass: 050404
+    database: 0
   alias:
     endpoint: oss-cn-wuhan-lr.aliyuncs.com
     access-key-id: ${ALI_OSS_ACCESS_KEY_ID}
