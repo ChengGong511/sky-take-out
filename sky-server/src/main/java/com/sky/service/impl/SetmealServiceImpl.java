@@ -15,6 +15,7 @@ import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetmealService;
+import com.sky.vo.DishItemVO;
 import com.sky.vo.SetmealVO;
 //import com.sun.xml.internal.bind.v2.TODO;
 import org.springframework.beans.BeanUtils;
@@ -118,5 +119,16 @@ public class SetmealServiceImpl implements SetmealService {
         //批量删除菜品口味表中的数据
         setmealDishMapper.deleteBySetmealIds(ids);
 
+    }
+
+    @Override
+    public List<Setmeal> list(Setmeal setmeal) {
+        List<Setmeal> list=setmealMapper.list(setmeal);
+        return list;
+    }
+
+    @Override
+    public List<DishItemVO> getDishItemById(Long id) {
+        return  setmealMapper.getDishItemBySetmealId(id);
     }
 }

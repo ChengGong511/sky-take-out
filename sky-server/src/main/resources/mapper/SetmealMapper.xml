@@ -59,4 +59,23 @@
             </if>
         </where>
     </select>
+    <select id="list" parameterType="com.sky.entity.Setmeal" resultType="com.sky.entity.Setmeal">
+        select * from setmeal
+        <where>
+            <if test="name != null">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="categoryId != null">
+                and category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="getDishItemBySetmealId" resultType="com.sky.vo.DishItemVO" parameterType="long">
+        select sd.name,sd.copies,d.image,description from setmeal_dish sd left join `sky-take-out`.dish d on d.id = sd.dish_id
+        where sd.setmeal_id = #{setmealId}
+    </select>
 </mapper>

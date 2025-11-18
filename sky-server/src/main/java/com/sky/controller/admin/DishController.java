@@ -1,5 +1,6 @@
 package com.sky.controller.admin;
 
+import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@RestController("adminDishController")
 @RequestMapping("/admin/dish")
 @Slf4j
 @Api(tags = "菜品相关接口")
@@ -76,9 +77,12 @@ public class DishController {
     @GetMapping("list")
     @ApiOperation("根据分类ID查询菜品列表")
     public Result<List<DishVO>> list(Long categoryId){
-        log.info("根据分类ID查询菜品列表：{}",categoryId);
-        List<DishVO> dishVOList=dishService.list(categoryId);
-        return Result.success(dishVOList);
+        Dish dish = new Dish();
+        dish.setCategoryId(categoryId);
+        dish.setStatus(StatusConstant.ENABLE);//查询起售中的菜品
+
+        List<DishVO> list = dishService.listWithFlavor(dish);
+        return Result.success(list);
     }
 }
 

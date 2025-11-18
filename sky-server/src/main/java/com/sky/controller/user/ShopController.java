@@ -5,6 +5,7 @@ import com.sky.service.impl.ShopServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("userShopController")
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Api(tags="店铺管理")
 public class ShopController {
-
+    @Autowired
     private ShopServiceImpl shopService;
     @ApiOperation(value = "查看店铺状态")
     @GetMapping("/status")
