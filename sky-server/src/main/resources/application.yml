@@ -17,6 +17,9 @@ spring:
     port: ${sky.redis.port}
     requirepass: ${sky.redis.requirepass}
     database: ${sky.redis.database}
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.sky.entity

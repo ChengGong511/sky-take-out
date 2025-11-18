@@ -1,6 +1,7 @@
 package com.sky.controller.admin;
 
 import com.sky.result.Result;
+import com.sky.service.ShopService;
 import com.sky.service.impl.ShopServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class ShopController {
 
     @Autowired
-    private ShopServiceImpl shopService;
+    private ShopService shopService;
     @ApiOperation(value = "修改店铺状态")
     @PutMapping("/{status}")
     public Result updateShopStatus(@PathVariable Integer status) {
