@@ -15,6 +15,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class SetmealController {
 
     @ApiOperation("根据id查询套餐菜品" )
     @GetMapping("/dish/{id}")
+    @Cacheable(value = "setmealDishCache",key = "#id")
     public Result<List<DishItemVO>> dishList(@PathVariable Long id){
         log.info("根据id查询套餐菜品：{}",id);
         List<DishItemVO> dishItemVOList=setmealService.getDishItemById(id);
@@ -40,6 +42,7 @@ public class SetmealController {
 
     @ApiOperation("根据分类ID查询套餐列表")
     @GetMapping("/list")
+    @Cacheable(value = "setmealCache",key = "#categoryId")
     public Result<List<Setmeal>> list(Long categoryId){
         Setmeal setmeal = new Setmeal();
         setmeal.setCategoryId(categoryId);

@@ -12,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,28 +31,13 @@ public class DishController {
 
     @GetMapping("list")
     @ApiOperation("根据分类ID查询菜品")
+    @Cacheable(value = "dishCache",key = "'dish_'+#categoryId")
     public Result<List<DishVO>> list(Long categoryId){
-        //构造Redis的key ：dish_分类ID
-        String key = "dish_" + categoryId;
-
-        //查询Redis中是否有数据
-        List<DishVO> list =(List<DishVO>) redisTemplate.opsForValue().get(key);
-
-        //如果存在，直接返回，无须查询数据库
-        if(list!=null &&list.size()>0){
-            return Result.success(list);
-        }
-
-        //如果不存在，查询数据库，将查询到的数据存入Redis
-
+        List<DishVO> list;
         Dish dish = new Dish();
         dish.setCategoryId(categoryId);
         dish.setStatus(StatusConstant.ENABLE);//查询起售中的菜品
-
          list = dishService.listWithFlavor(dish);
-
-         //将数据存入Redis
-        redisTemplate.opsForValue().set(key,list);
 
         return Result.success(list);
     }

@@ -13,8 +13,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 import java.util.Set;
@@ -35,12 +39,10 @@ public class DishController {
 
     @ApiOperation("新增菜品")
     @PostMapping
+    @Cacheable(value = "dishCache",key = "'dish_'+#dishDTO.categoryId")
     public Result save(@RequestBody DishDTO dishDTO){
         log.info("新增菜品：{}", dishDTO);
         dishService.saveWithFlavors(dishDTO);
-
-        // 清理缓存
-        clearCache("dish_"+dishDTO.getCategoryId());
 
         return Result.success();
     }
@@ -55,12 +57,11 @@ public class DishController {
 
     @ApiOperation("菜品批量删除")
     @DeleteMapping
+    @CacheEvict(value = "dishCache",allEntries = true)
     public Result delete(@RequestParam List<Long> ids){
         log.info("菜品批量删除：{}", ids);
         dishService.delete(ids);
 
-        // 清理所有菜品缓存
-       clearCache("dish_*");
         return Result.success();
     }
 
@@ -74,25 +75,19 @@ public class DishController {
 
     @ApiOperation("修改菜品信息")
     @PutMapping
+    @CachePut(value = "dishCache",key = "'dish_'+#dishDTO.categoryId")
     public Result update(@RequestBody DishDTO dishDTO){
         log.info("修改菜品信息：{}", dishDTO);
         dishService.updateWithFlavor(dishDTO);
-
-        // 清理所有菜品缓存
-        clearCache("dish_*");
-
         return Result.success();
     }
 
     @PostMapping("/status/{status}")
     @ApiOperation("启用禁用菜品")
+    @CacheEvict(value = "dishCache",allEntries = true)
     public Result startOrStop(@PathVariable Integer status,long id){
         log.info("启用禁用菜品：{},{}",status,id);
         dishService.startOrStop(status,id);
-
-        // 清理所有菜品缓存
-        clearCache("dish_*");
-
         return Result.success();
     }
 
@@ -102,7 +97,6 @@ public class DishController {
         Dish dish = new Dish();
         dish.setCategoryId(categoryId);
         dish.setStatus(StatusConstant.ENABLE);//查询起售中的菜品
-
         List<DishVO> list = dishService.listWithFlavor(dish);
         return Result.success(list);
     }

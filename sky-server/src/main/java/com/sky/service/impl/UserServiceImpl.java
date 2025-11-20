@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.sky.context.BaseContext.threadLocal;
+
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
@@ -32,8 +35,6 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
     @Override
     public User wxLogin(UserLoginDTO userLoginDTO) {
-        log.info("Wechat appid :{}", weChatProperties.getAppid());
-        log.info("Wechat secret :{}", weChatProperties.getSecret());
         //调用微信接口，获取用户信息
         String openid = getOpenid(userLoginDTO.getCode());
         //判断openid是否存在，如果为空，则说明获取用户信息失败，抛出异常
