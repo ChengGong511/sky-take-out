@@ -80,4 +80,37 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             shoppingCartMapper.insert(shoppingCart);
         }
     }
+
+    @Override
+    public void sub(ShoppingCartDTO shoppingCartDTO) {
+        Long userId=BaseContext.getCurrentId();
+
+        //添加购物车的业务逻辑
+
+        //先查看购物车中是否已经存在该菜品或套餐,数量大于1就数量减1,等于1就删除该记录
+        //根据用户id、菜品id、套餐id、口味查询购物车
+        ShoppingCart shoppingCart=new ShoppingCart();
+        BeanUtils.copyProperties(shoppingCartDTO,shoppingCart);
+        shoppingCart.setUserId(userId);
+        List<ShoppingCart> shoppingCartList = shoppingCartMapper.list(shoppingCart);
+        if(shoppingCartList.get(0).getNumber()>1) {
+            //说明购物车中已经存在该菜品或套餐
+            ShoppingCart cart = shoppingCartList.get(0);
+            cart.setNumber(cart.getNumber() - 1);//update shopping_cart set number=number-1 where id=?
+            shoppingCartMapper.updateNumberById(cart);
+
+        }
+        else{
+            //数量等于1就删除该记录
+            //delete from shopping_cart where id=?
+            shoppingCartMapper.deleteById(shoppingCartList.get(0).getId());
+        }
+    }
+
+    @Override
+    public void clean() {
+        Long userId=BaseContext.getCurrentId();
+        //清空购物车的业务逻辑
+        shoppingCartMapper.deleteByUserId(userId);
+    }
 }
