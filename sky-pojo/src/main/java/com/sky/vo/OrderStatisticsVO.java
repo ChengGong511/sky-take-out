@@ -1,9 +1,11 @@
 package com.sky.vo;
 
+import lombok.Builder;
 import lombok.Data;
 import java.io.Serializable;
 
 @Data
+@Builder
 public class OrderStatisticsVO implements Serializable {
     //待接单数量
     private Integer toBeConfirmed;
@@ -13,4 +15,6 @@ public class OrderStatisticsVO implements Serializable {
 
     //派送中数量
     private Integer deliveryInProgress;
+
+
 }

@@ -19,3 +19,5 @@ sky:
     access-key-id: ${ALI_OSS_ACCESS_KEY_ID}
     access-key-secret: ${ALI_OSS_ACCESS_KEY_SECRET}
     bucket-name: sky-gc
+  baidu:
+    AK: ${BAIDU_AK}
