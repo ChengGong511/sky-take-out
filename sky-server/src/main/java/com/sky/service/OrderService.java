@@ -42,4 +42,6 @@ public interface OrderService {
     PageResult historyOrders(OrdersPageQueryDTO ordersPageQueryDTO);
 
     void repetition(Long id);
+
+    void reminder(Long id);
 }

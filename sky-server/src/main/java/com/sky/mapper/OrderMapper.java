@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Update;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface OrderMapper {
@@ -39,4 +40,15 @@ public interface OrderMapper {
     List<Orders> getByStatusAndTimeout(Integer status, LocalDateTime orderTime);
 
 
+    @Select("select sum(amount) from orders where order_time >= #{begin} and order_time <= #{end} and status = #{status}")
+    Double sumByMap(Map map);
+
+    @Select("select count(*) from orders where status = #{completed} and order_time >= #{beginTime} and order_time <= #{endTime}")
+    Long countOrdersByStatus(Integer completed, LocalDateTime beginTime, LocalDateTime endTime);
+
+    @Select("select count(*) from orders where order_time >= #{beginTime} and order_time <= #{endTime}")
+    Long countAllOrders(LocalDateTime beginTime, LocalDateTime endTime);
+
+    @Select("select id from orders where order_time between #{beginTime} and #{endTime}")
+    List<Long> listOrdersByDate(LocalDateTime beginTime, LocalDateTime endTime);
 }

@@ -10,4 +10,19 @@
             (#{item.orderId}, #{item.dishId}, #{item.setmealId}, #{item.name}, #{item.image}, #{item.dishFlavor}, #{item.number}, #{item.amount})
         </foreach>
     </insert>
+    <select id="listTop10ByDate" resultType="java.util.Map">
+        select name as name, sum(number) as value
+        from order_detail
+        where dish_id in (
+        select distinct dish_id
+        from order_detail
+        where order_id in
+        <foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+        )
+        group by name
+        order by value desc
+        limit 10
+    </select>
 </mapper>
