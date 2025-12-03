@@ -55,7 +55,7 @@ public class OrderController {
 
     @GetMapping("/historyOrders")
     @ApiOperation("条件查询订单")
-    public Result<PageResult> historyOrders(OrdersPageQueryDTO ordersPageQueryDTO) {
+    public Result<PageResult> historyOrders( OrdersPageQueryDTO ordersPageQueryDTO) {
         log.info("条件查询订单：{}", ordersPageQueryDTO);
         ordersPageQueryDTO.setUserId(BaseContext.getCurrentId());
         PageResult pageResult = orderService.historyOrders(ordersPageQueryDTO);
@@ -69,4 +69,7 @@ public class OrderController {
         orderService.repetition(id);
         return Result.success();
     }
+
+
+
 }
