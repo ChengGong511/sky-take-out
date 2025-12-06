@@ -4,8 +4,10 @@ import com.sky.context.BaseContext;
 import com.sky.entity.AddressBook;
 import com.sky.result.Result;
 import com.sky.service.AddressBookService;
+import com.sky.vo.DeliveryInfoVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/user/addressBook")
 @Api(tags = "C端地址簿接口")
+@Slf4j
 public class AddressBookController {
 
     @Autowired
@@ -108,6 +111,14 @@ public class AddressBookController {
         }
 
         return Result.error("没有查询到默认地址");
+    }
+
+    @GetMapping("/checkDelivery/{addressId}")
+    @ApiOperation("校验配送范围")
+    public Result<DeliveryInfoVO> checkDelivery(@PathVariable Long addressId) {
+        log.info("校验配送范围，地址ID：{}", addressId);
+        DeliveryInfoVO deliveryInfo = addressBookService.checkDeliveryRange(addressId);
+        return Result.success(deliveryInfo);
     }
 
 }

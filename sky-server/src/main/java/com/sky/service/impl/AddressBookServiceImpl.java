@@ -2,8 +2,12 @@ package com.sky.service.impl;
 
 import com.sky.context.BaseContext;
 import com.sky.entity.AddressBook;
+import com.sky.entity.GeoLocation;
+import com.sky.entity.RidingResult;
 import com.sky.mapper.AddressBookMapper;
 import com.sky.service.AddressBookService;
+import com.sky.service.BaiduMapService;
+import com.sky.vo.DeliveryInfoVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +20,10 @@ public class AddressBookServiceImpl implements AddressBookService {
     @Autowired
     private AddressBookMapper addressBookMapper;
 
+    @Autowired
+    private BaiduMapService baiduMapService;
+
+    String shopAddress="湖北省武汉市江夏区东湖新技术开发区光谷二路29号";
     /**
      * 条件查询
      *
@@ -81,6 +89,44 @@ public class AddressBookServiceImpl implements AddressBookService {
      */
     public void deleteById(Long id) {
         addressBookMapper.deleteById(id);
+    }
+
+
+    public DeliveryInfoVO checkDeliveryRange(Long addressId) {
+        AddressBook addressBook = addressBookMapper.getById(addressId);
+        if (addressBook == null) {
+            return DeliveryInfoVO.builder()
+                    .deliverable(false)
+                    .errorMsg("地址不存在")
+                    .build();
+        }
+
+        String userAddress = addressBook.getProvinceName()
+                + addressBook.getCityName()
+                + addressBook. getDistrictName()
+                + addressBook.getDetail();
+
+        GeoLocation userLocation = baiduMapService.getGeoLocation(userAddress);
+        GeoLocation shopLocation = baiduMapService.getGeoLocation(shopAddress);
+
+        RidingResult ridingResult = baiduMapService.getRidingRouteByCoord(shopLocation, userLocation);
+
+        if (ridingResult == null || ridingResult.getDistance() > 10000) {
+            return DeliveryInfoVO.builder()
+                    .deliverable(false)
+                    .distanceKm(ridingResult != null ? ridingResult.getDistanceInKm() : null)
+                    .errorMsg("超出配送范围（仅支持10公里内配送）")
+                    .build();
+        }
+
+        int estimatedMinutes = (int) Math.ceil(ridingResult.getDurationInMinutes()) + 15; // 加15分钟出餐时间
+
+        return DeliveryInfoVO.builder()
+                .deliverable(true)
+                .distanceKm(ridingResult. getDistanceInKm())
+                . estimatedMinutes(estimatedMinutes)
+                .estimatedTimeDesc("预计" + estimatedMinutes + "分钟送达")
+                . build();
     }
 
 }

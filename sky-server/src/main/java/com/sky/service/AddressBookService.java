@@ -1,6 +1,8 @@
 package com.sky.service;
 
 import com.sky.entity.AddressBook;
+import com.sky.vo.DeliveryInfoVO;
+
 import java.util.List;
 
 public interface AddressBookService {
@@ -17,4 +19,5 @@ public interface AddressBookService {
 
     void deleteById(Long id);
 
+    DeliveryInfoVO checkDeliveryRange(Long addressId);
 }
